@@ -278,3 +278,4 @@ Use at your own risk.
   password – which is not needed – and exits with an error, because it doesn't
   receive any password prompts)
 * YAML config doesn't support nested values
+* Ruby & liquid dependency should be optional
