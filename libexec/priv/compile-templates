@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+#
+# Parses templates using Liquid
+#
+require 'yaml'
+require 'fileutils'
+require 'liquid'
+
+Liquid::Template.error_mode = :strict
+
+files_path  = ARGV[0]
+config_path = ARGV[1]
+
+config = YAML.load_file(config_path)
+
+Dir["#{files_path}/modules/**/*.liquid"].each do |tpl|
+  template = Liquid::Template.parse(File.read(tpl))
+  parsed = template.render(config, { strict_variables: true })
+
+  File.write(tpl.gsub('.liquid', ''), parsed)
+end

@@ -1,0 +1,48 @@
+#!/bin/bash
+
+[ -n "$DEBUG" ] && set -v
+
+set -eu
+
+source $WELDER_ROOT/libexec/priv/_helpers
+
+playbook=$1
+[ -z "$playbook" ] && __fail "Usage: x run <playbook-name>"
+
+__load_config "$playbook.yml"
+
+[ -z "$cfg_ssh_url" ] && __fail "ssh_url variable must be set in $playbook.yml"
+[ ! -d ./modules ]    && __fail "no modules/ directory found"
+
+# Run all *.sh scripts for each module listed in $playbook
+function __run_scripts() {
+  echo
+
+  for module in "${cfg_modules[@]}"
+  do
+    __info "module $module\n"
+
+    for script in $(find "./modules/$module" -name "*.sh")
+    do
+      __info "script $script\n"
+
+      $WELDER_ROOT/libexec/priv/run-ssh-script "$cfg_ssh_url" "$(< $script)" $sudo_pass
+
+      echo
+    done
+
+    echo
+    echo
+  done
+}
+
+welder compile $playbook
+
+__user "what's sudo password for $cfg_ssh_url: "
+read -se sudo_pass
+
+__run_scripts
+
+welder cleanup $playbook
+
+__success "all done!"

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Usage: welder <subcommand> [options]"
+echo
+echo "Subcommands:"
+echo "    run      run scripts on the server"
+echo "    version  welder version"
+echo ""
+

@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+#
+#
+
+[ -n "$DEBUG" ] && set -v
+
+set -eu
+
+source $WELDER_ROOT/libexec/priv/_helpers
+
+playbook=$1
+[ -z "$playbook" ] && __fail "Usage: x compile <playbook-name>"
+
+__ensure_rsync
+__load_config "$playbook.yml"
+
+tmp_dir=./tmp/setup
+mkdir -p $tmp_dir
+
+# Copy all "files" directories to ./tmp so they can be parsed
+rsync -av --delete  --prune-empty-dirs --include="*/" --include="modules/*/files/**" --exclude='*' modules $tmp_dir
+
+# Compile templates
+$WELDER_ROOT/libexec/priv/compile-templates $tmp_dir "./config.yml"
+
+# Compile yaml config into shell-compatible variables
+$WELDER_ROOT/libexec/priv/parse-config "./config.yml" > $tmp_dir/config-variables
+$WELDER_ROOT/libexec/priv/parse-config "./vault.yml" >> $tmp_dir/config-variables
+
+__success "compiling templates"
+
+__info "uploading template files to the server"
+
+# rsync compiled files to the server, skipping source (liquid) templates
+rsync -a --delete --exclude="*.liquid" $tmp_dir/ $cfg_ssh_url:setup
+
+__success "uploading template files to the server"

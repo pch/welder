@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# welder-run-script
+#
+
+[ -n "$DEBUG" ] && set -v
+
+set -eu
+
+playbook=$1
+script=$2
+
+__load_config "$playbook.yml"
+
+[ -z "$playbook" ]       && __fail "Usage: x run-script <playbook-name>"
+[ ! -f ./$playbook.yml ] && __fail "No $playbook.yml file found"
+[ -z "$cfg_ssh_url" ]    && __fail "ssh_url variable must be set in $playbook.yml"
+
+ssh -t "$cfg_ssh_url" "$(< $script)"
+
+__success "done!"
