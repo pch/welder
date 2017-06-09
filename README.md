@@ -1,6 +1,6 @@
 # Welder
 
-Welder allows you to set up a linux server with plain shell scripts.
+Welder allows you to set up a Linux server with plain shell scripts.
 
 I wrote it out of frustration with Ansible. Ansible is an amazing and powerful
 tool, but for my needs it's just too much. 90% of the time all I need is:
