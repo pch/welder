@@ -175,6 +175,13 @@ For more information on how to set up GPG/PGP, see [this excellent tutorial][gpg
 Think of this as just another level of security for your private git repos. You
 probably don't want to store the encrypted vault in a public repo.
 
+#### sudo
+
+Because `sudo` password is passed as an argument to the
+[`expect script`](https://github.com/pch/welder/blob/master/libexec/priv/run-ssh-script),
+it will be visible in the process list on your local computer. This could be
+an issue if you're using a shared machine to run setup scripts.
+
 ### Example setup script
 
 ~~~ sh
@@ -279,3 +286,4 @@ Use at your own risk.
   receive any password prompts)
 * YAML config doesn't support nested values
 * Ruby & liquid dependency should be optional
+
