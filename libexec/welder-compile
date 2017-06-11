@@ -21,14 +21,26 @@ mkdir -p $tmp_dir
 # Copy all "files" directories to ./tmp so they can be parsed
 rsync -av --delete  --prune-empty-dirs --include="*/" --include="modules/*/files/**" --exclude='*' modules $tmp_dir
 
-# Compile templates
-$WELDER_ROOT/libexec/priv/compile-templates $tmp_dir "./config.yml"
+# Compile templates (if there's any *.liquid files)
+if test -n "$(find $tmp_dir -name '*.liquid' -print -quit)"
+then
+  __info "compiling *.liquid templates"
+  $WELDER_ROOT/libexec/priv/compile-templates $tmp_dir
+  __success "compiled templates"
+fi
 
-# Compile yaml config into shell-compatible variables
-$WELDER_ROOT/libexec/priv/parse-config "./config.yml" > $tmp_dir/config-variables
-$WELDER_ROOT/libexec/priv/parse-config "./vault.yml" >> $tmp_dir/config-variables
+# Compile yaml config files into shell-compatible variables
+rm $tmp_dir/config-variables 2> /dev/null
 
-__success "compiling templates"
+if [ -f "./config.yml" ]
+then
+  $WELDER_ROOT/libexec/priv/parse-config "./config.yml" > $tmp_dir/config-variables
+fi
+
+if [ -f "./vault.yml" ]
+then
+  $WELDER_ROOT/libexec/priv/parse-config "./vault.yml" >> $tmp_dir/config-variables
+fi
 
 __info "uploading template files to the server"
 

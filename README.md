@@ -22,6 +22,7 @@ Welder allows you to:
 * set up a server with a single command (`welder run <playbook>`)
 * run one-off shell scripts (`welder run-script <user@example.com> <path/to/script.sh>`)
 * use [liquid](https://github.com/Shopify/liquid) templates for configuration
+  (optional)
 * enter `sudo` password just once per playbook
 
 See [`welder-contrib`](https://github.com/pch/welder-contrib) for some example
@@ -239,8 +240,11 @@ templates and config, run `welder compile <playbook>` first and
 
 1. Install dependencies
 
-   Welder requires rsync, ruby and
-   [liquid](https://github.com/Shopify/liquid):
+   Welder requires rsync and ruby. Ruby is used mainly as a convenient way to
+   parse YAML configuration files.
+
+   Optionally, if you'd like to use the templating feature,
+   you need to install [liquid](https://github.com/Shopify/liquid) gem:
 
     ~~~ sh
     $ gem install liquid
@@ -279,11 +283,10 @@ with caution. It won't protect you from screw-ups, like
 
 Use at your own risk.
 
-## Known Issues
+## Known Issues / Limitations
 
 * The `expect` wrapper script doesn't play well with `root` user (asks for sudo
   password – which is not needed – and exits with an error, because it doesn't
   receive any password prompts)
 * YAML config doesn't support nested values
-* Ruby & liquid dependency should be optional
-
+* Ruby dependency should be optional
