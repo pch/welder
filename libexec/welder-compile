@@ -30,7 +30,7 @@ then
 fi
 
 # Compile yaml config files into shell-compatible variables
-rm $tmp_dir/config-variables 2> /dev/null
+[ -f $tmp_dir/config-variables ] && rm $tmp_dir/config-variables
 
 if [ -f "./config.yml" ]
 then
