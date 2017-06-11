@@ -2,6 +2,8 @@
 
 Welder allows you to set up a Linux server with plain shell scripts.
 
+![](./demo.gif)
+
 I wrote it out of frustration with Ansible. Ansible is an amazing and powerful
 tool, but for my needs it's just too much. 90% of the time all I need is:
 
