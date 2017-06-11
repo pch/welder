@@ -26,7 +26,15 @@ function __run_scripts() {
     do
       __info "script $script\n"
 
-      $WELDER_ROOT/libexec/priv/run-ssh-script "$cfg_ssh_url" "$(< $script)" $sudo_pass
+      if [ -z ${sudo_pass+x} ]
+      then
+        # no sudo_pass set, run the script directly
+        ssh -t "$cfg_ssh_url" "$(< $script)"
+      else
+        # wrap the ssh script with an "expect" script to automatically
+        # enter sudo password
+        $WELDER_ROOT/libexec/priv/run-ssh-script "$cfg_ssh_url" "$(< $script)" $sudo_pass
+      fi
 
       echo
     done
@@ -38,8 +46,13 @@ function __run_scripts() {
 
 welder compile $playbook
 
-__user "what's sudo password for $cfg_ssh_url: "
-read -se sudo_pass
+# Ask sudo password for non-root users
+# For this to work, ssh_url needs to follow user@server-url format
+if [[ ! $cfg_ssh_url =~ root\@.* ]]
+then
+  __user "what's the sudo password for $cfg_ssh_url: "
+  read -se sudo_pass
+fi
 
 __run_scripts
 

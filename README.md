@@ -285,8 +285,5 @@ Use at your own risk.
 
 ## Known Issues / Limitations
 
-* The `expect` wrapper script doesn't play well with `root` user (asks for sudo
-  password – which is not needed – and exits with an error, because it doesn't
-  receive any password prompts)
 * YAML config doesn't support nested values
 * Ruby dependency should be optional
