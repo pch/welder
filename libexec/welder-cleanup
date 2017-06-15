@@ -14,6 +14,6 @@ playbook=$1
 
 __load_config "$playbook.yml"
 
-ssh $cfg_ssh_url "rm -r setup/"
+ssh $cfg_ssh_url -p $cfg_ssh_port "rm -r setup/"
 
 __success "setup/ directory removed from $cfg_ssh_url"
