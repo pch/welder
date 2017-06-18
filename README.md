@@ -64,6 +64,7 @@ Example playbook:
 
 ~~~ yaml my-site.yml
 ssh_url: admin@example.com
+ssh_port: 22  # Optional (default: 22)
 
 # List of modules to execute
 modules:
