@@ -4,12 +4,13 @@
 # to automatically enter sudo passwords for the user.
 #
 set url [lindex $argv 0];
-set command [lindex $argv 1];
-set sudo_pass [lindex $argv 2];
+set ssh_port [lindex $argv 1];
+set command [lindex $argv 2];
+set sudo_pass [lindex $argv 3];
 
 set timeout -1
 
-spawn -noecho ssh -t $url $command
+spawn -noecho ssh -t $url -p $ssh_port $command
 expect -exact "\[sudo\] password for "
 send -- "$sudo_pass\r"
 interact

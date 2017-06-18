@@ -11,7 +11,8 @@ playbook=$1
 
 __load_config "$playbook.yml"
 
-[ -z "$cfg_ssh_url" ] && __fail "ssh_url variable must be set in $playbook.yml"
+[ -z "${cfg_ssh_url}" ] && __fail "ssh_url variable must be set in $playbook.yml"
+if [ -z "${cfg_ssh_port}" ]; then cfg_ssh_port="22"; fi
 [ ! -d ./modules ]    && __fail "no modules/ directory found"
 
 # Run all *.sh scripts for each module listed in $playbook
@@ -29,11 +30,11 @@ function __run_scripts() {
       if [ -z ${sudo_pass+x} ]
       then
         # no sudo_pass set, run the script directly
-        ssh -t "$cfg_ssh_url" "$(< $script)"
+        ssh -t "$cfg_ssh_url" -p "$cfg_ssh_port" "$(< $script)"
       else
         # wrap the ssh script with an "expect" script to automatically
         # enter sudo password
-        $WELDER_ROOT/libexec/priv/run-ssh-script "$cfg_ssh_url" "$(< $script)" $sudo_pass
+        $WELDER_ROOT/libexec/priv/run-ssh-script "$cfg_ssh_url" "$cfg_ssh_port" "$(< $script)" $sudo_pass
       fi
 
       echo

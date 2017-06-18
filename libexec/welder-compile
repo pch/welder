@@ -45,6 +45,6 @@ fi
 __info "uploading template files to the server"
 
 # rsync compiled files to the server, skipping source (liquid) templates
-rsync -a --delete --exclude="*.liquid" $tmp_dir/ $cfg_ssh_url:setup
+rsync -a -e "ssh -p $cfg_ssh_port" --delete --exclude="*.liquid" $tmp_dir/ $cfg_ssh_url:setup
 
 __success "uploading template files to the server"
