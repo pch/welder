@@ -31,4 +31,7 @@ function __load_config() {
   # seems to fail with process substitution in bash, e.g.:
   #     source <($WELDER_ROOT/libexec/priv/parse-config $1)
   source /dev/stdin <<< "$(cat <($WELDER_ROOT/libexec/priv/parse-config ./$1))"
+
+  if [ -z "${cfg_ssh_url-}" ];  then __fail "ssh_url variable must be set in $playbook.yml"; fi
+  if [ -z "${cfg_ssh_port-}" ]; then cfg_ssh_port="22"; fi
 }

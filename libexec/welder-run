@@ -11,9 +11,7 @@ playbook=$1
 
 __load_config "$playbook.yml"
 
-[ -z "${cfg_ssh_url}" ] && __fail "ssh_url variable must be set in $playbook.yml"
-if [ -z "${cfg_ssh_port}" ]; then cfg_ssh_port="22"; fi
-[ ! -d ./modules ]    && __fail "no modules/ directory found"
+[ ! -d ./modules ] && __fail "no modules/ directory found"
 
 # Run all *.sh scripts for each module listed in $playbook
 function __run_scripts() {

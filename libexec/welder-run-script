@@ -10,12 +10,10 @@ set -eu
 playbook=$1
 script=$2
 
-__load_config "$playbook.yml"
-
 [ -z "$playbook" ]       && __fail "Usage: x run-script <playbook-name>"
 [ ! -f ./$playbook.yml ] && __fail "No $playbook.yml file found"
-[ -z "${cfg_ssh_url}" ]  && __fail "ssh_url variable must be set in $playbook.yml"
-if [ -z "${cfg_ssh_port}" ]; then cfg_ssh_port="22"; fi
+
+__load_config "$playbook.yml"
 
 ssh -t "$cfg_ssh_url" -p "$cfg_ssh_port" "$(< $script)"
 
