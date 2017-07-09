@@ -1,4 +1,4 @@
-# Welder
+# 👨‍🏭 Welder
 
 Welder allows you to set up a Linux server with plain shell scripts.
 
