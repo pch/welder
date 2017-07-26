@@ -9,6 +9,8 @@ tool, but for my needs it's just too much. 90% of the time all I need is:
 
 ~~~ sh
 ssh -t user@example.com "$(< ./my-setup-script.sh)"
+# or:
+ssh -t user@example.com "$(cat ./my-setup-script.sh)"
 ~~~
 
 In most basic terms, that's what welder does.
