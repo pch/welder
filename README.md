@@ -68,6 +68,8 @@ Example playbook:
 ssh_url: admin@example.com
 ssh_port: 22  # Optional (default: 22)
 
+shared_path: ../shared # optional
+
 # List of modules to execute
 modules:
   - system
@@ -157,6 +159,24 @@ echo $cfg_app_dir
 
 **NOTE**: In order for this to work reliably, `config.yml` has to be fairly flat
 and simple - nested hashes are not supported.
+
+
+### Shared Modules
+
+If you want to avoid duplicating modules across different projects, you can
+specify `shared_path` in your playbook YML file:
+
+~~~ yaml my-site.yml
+ssh_url: admin@example.com
+
+shared_path: ../shared
+
+modules:
+  - system
+  - firewall
+~~~
+
+In the example above, `../shared` directory should contain `modules` directory.
 
 ### Security Notes
 

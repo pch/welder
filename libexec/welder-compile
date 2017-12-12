@@ -15,11 +15,25 @@ playbook=$1
 __ensure_rsync
 __load_config "$playbook.yml"
 
-tmp_dir=./tmp/setup
+tmp_dir=$(pwd)/tmp/setup
 mkdir -p $tmp_dir
+rm -rf $tmp_dir/*
+
+# rsyncs only the modules that include files/ directories
+# skips setup.sh scripts and creates list of files to be compiled
+# and uploaded to the server
+function __rsync_modules() {
+  rsync -av --prune-empty-dirs --include="*/" --include="modules/*/files/**" --exclude='*' ./modules $tmp_dir
+}
 
 # Copy all "files" directories to ./tmp so they can be parsed
-rsync -av --delete  --prune-empty-dirs --include="*/" --include="modules/*/files/**" --exclude='*' modules $tmp_dir
+if [ -z "${cfg_shared_path-}" ]; then
+  echo # do nothing
+else
+  cd $cfg_shared_path && __rsync_modules && cd -
+fi
+
+__rsync_modules
 
 # Compile templates (if there's any *.liquid files)
 if test -n "$(find $tmp_dir -name '*.liquid' -print -quit)"

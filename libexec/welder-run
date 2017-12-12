@@ -21,7 +21,19 @@ function __run_scripts() {
   do
     __info "module $module\n"
 
-    for script in $(find "./modules/$module" -name "*.sh")
+    if [ -z "${cfg_shared_path-}" ]; then
+      module_path="./modules/$module"
+    else
+      # shared path defined
+      if [ -d "./modules/$module" ]; then
+        # local module should have priority
+        module_path="./modules/$module"
+      else
+        module_path="$cfg_shared_path/modules/$module"
+      fi
+    fi
+
+    for script in $(find $module_path -name "*.sh")
     do
       __info "script $script\n"
 
