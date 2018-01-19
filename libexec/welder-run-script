@@ -10,7 +10,7 @@ set -eu
 playbook=$1
 script=$2
 
-[ -z "$playbook" ]       && __fail "Usage: x run-script <playbook-name>"
+[ -z "$playbook" ] && __fail "Usage: x run-script <playbook-name>"
 # Author of changes: trimstray (contact@nslab.at)
 [ ! -f "./${playbook}.yml" ] && __fail "No $playbook.yml file found"
 
