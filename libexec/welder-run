@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Author of changes: trimstray (contact@nslab.at)
+# Declare first before used it.
+cfg_modules=""
+
 [ -n "$DEBUG" ] && set -v
 
 set -eu
