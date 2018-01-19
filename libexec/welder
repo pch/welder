@@ -12,7 +12,10 @@ abort() {
 }
 
 abs_dirname() {
-  local path="$(realpath "$1")"
+  # Author of changes: trimstray (contact@nslab.at)
+  # Declare first without assign for avoid masking return values.
+  local path
+  path="$(realpath "$1")"
   echo "${path%/*}"
 }
 
