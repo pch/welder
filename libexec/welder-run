@@ -82,7 +82,8 @@ then
   # Added -r opt to read because:
   #   - we want strip leading and trailing spaces
   #   - we want to read data without removing backslashes before spaces and line feeds
-  read -rse sudo_pass
+  #   - added prompt with -p option
+  read -p "  Password:" -rse sudo_pass
 fi
 
 __run_scripts
