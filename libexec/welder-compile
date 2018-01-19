@@ -71,6 +71,7 @@ __info "uploading template files to the server"
 
 # rsync compiled files to the server, skipping source (liquid) templates
 # Author of changes: trimstray (contact@nslab.at)
+# shellcheck disable=SC2154
 rsync -a -e "ssh -p $cfg_ssh_port" --delete --exclude="*.liquid" "${tmp_dir}/" "${cfg_ssh_url}:setup"
 
 __success "uploading template files to the server"
