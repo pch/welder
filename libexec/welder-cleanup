@@ -7,7 +7,10 @@
 
 set -eu
 
-source $WELDER_ROOT/libexec/priv/_helpers
+# Author of changes: trimstray (contact@nslab.at)
+# We are not able to determine the value of the WELDER_ROOT variable so:
+# shellcheck disable=SC1090
+source "${WELDER_ROOT}/libexec/priv/_helpers"
 
 playbook=$1
 [ -z "$playbook" ] && __fail "Usage: x cleanup <playbook-name>"
