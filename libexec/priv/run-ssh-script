@@ -1,25 +1,8 @@
-#!/usr/bin/expect -f
-#
-# This script wraps the `ssh` command in an `expect` script,
-# to automatically enter sudo passwords for the user.
-#
-set url [lindex $argv 0];
-set ssh_port [lindex $argv 1];
-set command [lindex $argv 2];
-set sudo_pass [lindex $argv 3];
+#!/usr/bin/env bash
 
-set timeout -1
+local _url="$1"
+local _ssh_port="$2"
+local _command="$3"
+local _sudo_pass="$4"
 
-spawn -noecho ssh -t $url -p $ssh_port $command
-expect -exact "\[sudo\] password for "
-send -- "$sudo_pass\r"
-interact
-
-lassign [wait] pid spawnid os_error_flag value
-
-if {$os_error_flag == 0} {
-  puts "exit status: $value"
-} else {
-  puts "errno: $value"
-}
-exit $value
+ssh -t "$_url" -p "$_ssh_port" "echo "\$_sudo_pass" | sudo -S bash $_command"
