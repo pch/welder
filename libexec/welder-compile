@@ -21,7 +21,10 @@ __load_config "$playbook.yml"
 tmp_dir=$(pwd)/tmp/setup
 # Author of changes: trimstray (contact@nslab.at)
 mkdir -p "$tmp_dir"
-rm -rf $tmp_dir/*
+# Author of changes: trimstray (contact@nslab.at)
+# The command to fail if the variable is null or unset.
+# The following code prevents deleting the / directory.
+rm -rf "${tmp_dir:?}/"*
 
 # rsyncs only the modules that include files/ directories
 # skips setup.sh scripts and creates list of files to be compiled
