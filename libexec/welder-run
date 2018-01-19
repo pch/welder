@@ -26,7 +26,9 @@ function __run_scripts() {
 
   for module in "${cfg_modules[@]}"
   do
-    __info "module $module\n"
+    # Author of changes: trimstray (contact@nslab.at)
+    # Removed '\n' - it is used in __info().
+    __info "module $module"
 
     if [ -z "${cfg_shared_path-}" ]; then
       module_path="./modules/$module"
@@ -43,7 +45,9 @@ function __run_scripts() {
     # Author of changes: trimstray (contact@nslab.at)
     for script in $(find "$module_path" -name "*.sh")
     do
-      __info "script $script\n"
+    # Author of changes: trimstray (contact@nslab.at)
+    # Removed '\n' - it is used in __info().
+      __info "script $script"
 
       # Author of changes: trimstray (contact@nslab.at)
       if [ -z "${sudo_pass+x}" ]
