@@ -12,11 +12,13 @@ _kstate="$?"
 
 if [[ "$_kstate" -eq 0 ]] ; then
 
-  printf "\n%s:\n  [\e[0;32m%s\e[m]\n" "Remote script state" "done"
+  true
+  # printf "\n%s:\n  [\e[0;32m%s\e[m]\n" "Remote script state" "done"
 
 else
 
-  printf "\n%s:\n  [\e[0;31m%s\e[m]\n" "Remote script state" "fail"
+  false
+  # printf "\n%s:\n  [\e[0;31m%s\e[m]\n" "Remote script state" "fail"
 
 fi
 
