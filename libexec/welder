@@ -28,7 +28,7 @@ export WELDER_ROOT
 # shellcheck disable=SC1090
 source "${WELDER_ROOT}/libexec/priv/_helpers"
 
-bin_path="$(abs_dirname $0)"
+bin_path="$(abs_dirname "${0}")"
 export PATH="${bin_path}:${PATH}"
 
 command=$1
