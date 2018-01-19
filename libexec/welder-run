@@ -50,6 +50,13 @@ function __run_scripts() {
       __info "script $script"
 
       # Author of changes: trimstray (contact@nslab.at)
+      echo -en "\n\n"
+
+      printf %.s- {1..60}
+
+      echo -en "\n\n"
+
+      # Author of changes: trimstray (contact@nslab.at)
       if [ -z "${sudo_pass+x}" ]
       then
         # no sudo_pass set, run the script directly
@@ -61,11 +68,18 @@ function __run_scripts() {
         "${WELDER_ROOT}/libexec/priv/run-ssh-script" "$cfg_ssh_url" "$cfg_ssh_port" "$(< $script)" "$sudo_pass"
       fi
 
-      echo
+      # Author of changes: trimstray (contact@nslab.at)
+      echo -en "\n\n"
+
+      printf %.s- {1..60}
+
+      echo -en "\n"
+
     done
 
-    echo
-    echo
+    # Author of changes: trimstray (contact@nslab.at)
+    echo -en "\n\n"
+
   done
 }
 
