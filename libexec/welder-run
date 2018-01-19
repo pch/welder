@@ -77,7 +77,8 @@ welder compile "$playbook"
 # Author of changes: trimstray (contact@nslab.at)
 if [[ ! "$cfg_ssh_url" =~ root\@.* ]]
 then
-  __user "what's the sudo password for $cfg_ssh_url: "
+  # Author of changes: trimstray (contact@nslab.at)
+  __user "used sudo password for $cfg_ssh_url"
   # Author of changes: trimstray (contact@nslab.at)
   # Added -r opt to read because:
   #   - we want strip leading and trailing spaces
