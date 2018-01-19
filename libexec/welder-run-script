@@ -11,7 +11,8 @@ playbook=$1
 script=$2
 
 [ -z "$playbook" ]       && __fail "Usage: x run-script <playbook-name>"
-[ ! -f ./$playbook.yml ] && __fail "No $playbook.yml file found"
+# Author of changes: trimstray (contact@nslab.at)
+[ ! -f "./${playbook}.yml" ] && __fail "No $playbook.yml file found"
 
 __load_config "$playbook.yml"
 
