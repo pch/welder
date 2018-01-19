@@ -2,12 +2,12 @@
 
 # Author of changes: trimstray (contact@nslab.at)
 
-_url="$1"
-_ssh_port="$2"
-_command="$3"
+_cfg_ssh_url="$1"
+_cfg_ssh_port="$2"
+_script="$3"
 _sudo_pass="$4"
 
-ssh -t "$_url" -p "$_ssh_port" "echo "\$_sudo_pass" | sudo -S bash $_command"
+ssh -t "$_cfg_ssh_url" -p "$_cfg_ssh_port" "echo "\$_sudo_pass" | sudo -S bash $_script"
 _kstate="$?"
 
 if [[ "$_kstate" -eq 0 ]] ; then
