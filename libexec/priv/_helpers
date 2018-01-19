@@ -2,7 +2,7 @@
 
 function __info () {
   # Author of changes: trimstray (contact@nslab.at)
-  printf "  [ \033[00;34m..\033[0m ] %s" "$1"
+  printf "  [ \033[00;34m..\033[0m ] %s\n" "$1"
 }
 
 function __success () {
@@ -12,7 +12,7 @@ function __success () {
 
 function __user () {
   # Author of changes: trimstray (contact@nslab.at)
-  printf "\r  [ \033[0;33m?\033[0m ] %s" "$1"
+  printf "\r  [ \033[0;33m?\033[0m ] %s\n" "$1"
 }
 
 function __fail () {
