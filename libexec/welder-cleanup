@@ -3,6 +3,11 @@
 # Removes compiled files from the server
 #
 
+# Author of changes: trimstray (contact@nslab.at)
+# Declare first before used it.
+cfg_ssh_url=""
+cfg_ssh_port=""
+
 [ -n "$DEBUG" ] && set -v
 
 set -eu
