@@ -106,4 +106,7 @@ __run_scripts
 # Author of changes: trimstray (contact@nslab.at)
 welder cleanup "$playbook"
 
+# Author of changes: trimstray (contact@nslab.at)
+unset sudo_pass
+
 __success "all done!"

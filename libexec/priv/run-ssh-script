@@ -1,8 +1,23 @@
 #!/usr/bin/env bash
 
+# Author of changes: trimstray (contact@nslab.at)
+
 _url="$1"
 _ssh_port="$2"
 _command="$3"
 _sudo_pass="$4"
 
 ssh -t "$_url" -p "$_ssh_port" "echo "\$_sudo_pass" | sudo -S bash $_command"
+_kstate="$?"
+
+if [[ "$_kstate" -eq 0 ]] ; then
+
+  printf "\n%s:\n  [\e[0;32m%s\e[m]\n" "Remote script state" "done"
+
+else
+
+  printf "\n%s:\n  [\e[0;31m%s\e[m]\n" "Remote script state" "fail"
+
+fi
+
+unset _sudo_pass
