@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-local _url="$1"
-local _ssh_port="$2"
-local _command="$3"
-local _sudo_pass="$4"
+_url="$1"
+_ssh_port="$2"
+_command="$3"
+_sudo_pass="$4"
 
 ssh -t "$_url" -p "$_ssh_port" "echo "\$_sudo_pass" | sudo -S bash $_command"
