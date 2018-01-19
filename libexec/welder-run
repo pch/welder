@@ -36,18 +36,21 @@ function __run_scripts() {
       fi
     fi
 
-    for script in $(find $module_path -name "*.sh")
+    # Author of changes: trimstray (contact@nslab.at)
+    for script in $(find "$module_path" -name "*.sh")
     do
       __info "script $script\n"
 
-      if [ -z ${sudo_pass+x} ]
+      # Author of changes: trimstray (contact@nslab.at)
+      if [ -z "${sudo_pass+x}" ]
       then
         # no sudo_pass set, run the script directly
         ssh -t "$cfg_ssh_url" -p "$cfg_ssh_port" "$(< $script)"
       else
         # wrap the ssh script with an "expect" script to automatically
         # enter sudo password
-        $WELDER_ROOT/libexec/priv/run-ssh-script "$cfg_ssh_url" "$cfg_ssh_port" "$(< $script)" $sudo_pass
+        # Author of changes: trimstray (contact@nslab.at)
+        "${WELDER_ROOT}/libexec/priv/run-ssh-script" "$cfg_ssh_url" "$cfg_ssh_port" "$(< $script)" "$sudo_pass"
       fi
 
       echo
@@ -58,11 +61,13 @@ function __run_scripts() {
   done
 }
 
-welder compile $playbook
+# Author of changes: trimstray (contact@nslab.at)
+welder compile "$playbook"
 
 # Ask sudo password for non-root users
 # For this to work, ssh_url needs to follow user@server-url format
-if [[ ! $cfg_ssh_url =~ root\@.* ]]
+# Author of changes: trimstray (contact@nslab.at)
+if [[ ! "$cfg_ssh_url" =~ root\@.* ]]
 then
   __user "what's the sudo password for $cfg_ssh_url: "
   read -se sudo_pass
@@ -70,6 +75,7 @@ fi
 
 __run_scripts
 
-welder cleanup $playbook
+# Author of changes: trimstray (contact@nslab.at)
+welder cleanup "$playbook"
 
 __success "all done!"
