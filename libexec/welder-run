@@ -9,9 +9,9 @@ source $WELDER_ROOT/libexec/priv/_helpers
 playbook=$1
 [ -z "$playbook" ] && __fail "Usage: x run <playbook-name>"
 
-__load_config "$playbook.yml"
+__load_config "$WELDER_ROOT/$playbook.yml"
 
-[ ! -d ./modules ] && __fail "no modules/ directory found"
+[ ! -d "$WELDER_ROOT/modules" ] && __fail "no modules/ directory found"
 
 # Run all *.sh scripts for each module listed in $playbook
 function __run_scripts() {
@@ -22,14 +22,14 @@ function __run_scripts() {
     __info "module $module\n"
 
     if [ -z "${cfg_shared_path-}" ]; then
-      module_path="./modules/$module"
+      module_path="$WELDER_ROOT/modules/$module"
     else
       # shared path defined
       if [ -d "./modules/$module" ]; then
         # local module should have priority
-        module_path="./modules/$module"
+        module_path="$WELDER_ROOT/modules/$module"
       else
-        module_path="$cfg_shared_path/modules/$module"
+        module_path="$WELDER_ROOT/$cfg_shared_path/modules/$module"
       fi
     fi
 
