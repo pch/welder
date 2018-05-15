@@ -265,8 +265,8 @@ templates and config, run `welder compile <playbook>` first and
 
 1. Install dependencies
 
-   Welder requires rsync and ruby. Ruby is used mainly as a convenient way to
-   parse YAML configuration files.
+   Welder requires expect, rsync and ruby. Ruby is used mainly as a
+   convenient way to parse YAML configuration files.
 
    Optionally, if you'd like to use the templating feature,
    you need to install [liquid](https://github.com/Shopify/liquid) gem:
