@@ -13,11 +13,10 @@ playbook=$1
 [ -z "$playbook" ] && __fail "Usage: x compile <playbook-name>"
 
 __ensure_rsync
-__load_config "$playbook.yml"
+__load_config "$WELDER_ROOT/$playbook.yml"
 
-tmp_dir=$(pwd)/tmp/setup
-mkdir -p $tmp_dir
-rm -rf $tmp_dir/*
+tmp_dir=$(mktemp -d)
+trap 'rm -rf "$tmp_dir"' EXIT
 
 # rsyncs only the modules that include files/ directories
 # skips setup.sh scripts and creates list of files to be compiled
@@ -30,10 +29,10 @@ function __rsync_modules() {
 if [ -z "${cfg_shared_path-}" ]; then
   echo # do nothing
 else
-  cd $cfg_shared_path && __rsync_modules && cd -
+  cd "$WELDER_ROOT/$cfg_shared_path" && __rsync_modules && cd -
 fi
 
-__rsync_modules
+cd "$WELDER_ROOT" &&__rsync_modules && cd -
 
 # Compile templates (if there's any *.liquid files)
 if test -n "$(find $tmp_dir -name '*.liquid' -print -quit)"
