@@ -21,7 +21,6 @@ function __fail () {
 function __ensure_rsync() {
   if ! command -v rsync > /dev/null; then
     __fail "Please install rsync first"
-    exit 1
   fi
 }
 
