@@ -25,12 +25,23 @@ function __ensure_rsync() {
 }
 
 function __load_config() {
-  [ ! -f "$1" ] && __fail "No $1 file found"
+  [[ $# != 1 ]] && return 1
 
-  # seems to fail with process substitution in bash, e.g.:
-  #     source <($WELDER_ROOT/libexec/priv/parse-config $1)
-  source /dev/stdin <<< "$(cat <($WELDER_ROOT/libexec/priv/parse-config "$1"))"
+  local playbook=${WELDER_PLAYBOOK:-}
+  if [[ -z "$playbook" ]]; then
+    for playbook in "$1" "$WELDER_ROOT/$1" "$WELDER_ROOT/$1.yml" "$WELDER_ROOT/$1.yaml"; do
+      if [[ -e "$playbook" ]]; then
+        export WELDER_PLAYBOOK="$(mktemp -p "$WELDER_CACHE" playbook.XXXXXXXXXX)"
+        trap 'unlink "$WELDER_PLAYBOOK"' EXIT
+        cp "$playbook" "$WELDER_PLAYBOOK"
+        break
+      fi
+    done
+  fi
+  [[ -z "${WELDER_PLAYBOOK:-}" ]] && return 1
 
-  if [ -z "${cfg_ssh_url-}" ];  then __fail "ssh_url variable must be set in $1"; fi
+  eval "$($WELDER_ROOT/libexec/priv/parse-config "$WELDER_PLAYBOOK")"
+
+  if [ -z "${cfg_ssh_url-}" ]; then __fail "variable not set in playbook: ssh_url"; fi
   if [ -z "${cfg_ssh_port-}" ]; then cfg_ssh_port="22"; fi
 }
