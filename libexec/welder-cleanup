@@ -9,10 +9,7 @@ set -eu
 
 source $WELDER_ROOT/libexec/priv/_helpers
 
-playbook=$1
-[ -z "$playbook" ] && __fail "Usage: x cleanup <playbook-name>"
-
-__load_config "$WELDER_ROOT/$playbook.yml"
+__load_config "$@" || __fail "Usage: welder cleanup <playbook>"
 
 ssh $cfg_ssh_url -p $cfg_ssh_port "rm -r setup/"
 
