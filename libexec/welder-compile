@@ -22,17 +22,21 @@ trap 'rm -rf "$tmp_dir"' EXIT
 # skips setup.sh scripts and creates list of files to be compiled
 # and uploaded to the server
 function __rsync_modules() {
-  rsync -av --prune-empty-dirs --include="*/" --include="modules/*/files/**" --exclude='*' ./modules $tmp_dir
+  rsync -a --prune-empty-dirs --include="*/" --include="modules/*/files/**" --exclude='*' --quiet ./modules $tmp_dir
 }
 
 # Copy all "files" directories to ./tmp so they can be parsed
 if [ -z "${cfg_shared_path-}" ]; then
   echo # do nothing
 else
-  cd "$WELDER_ROOT/$cfg_shared_path" && __rsync_modules && cd -
+  pushd "$WELDER_ROOT/$cfg_shared_path" >/dev/null
+  __rsync_modules
+  popd >/dev/null
 fi
 
-cd "$WELDER_ROOT" &&__rsync_modules && cd -
+pushd "$WELDER_ROOT" >/dev/null
+__rsync_modules
+popd >/dev/null
 
 # Compile templates (if there's any *.liquid files)
 if test -n "$(find $tmp_dir -name '*.liquid' -print -quit)"
@@ -58,6 +62,6 @@ fi
 __info "uploading template files to the server"
 
 # rsync compiled files to the server, skipping source (liquid) templates
-rsync -a -e "ssh -p $cfg_ssh_port" --delete --exclude="*.liquid" $tmp_dir/ $cfg_ssh_url:setup
+rsync -a -e "ssh -p $cfg_ssh_port" --delete --exclude="*.liquid" --quiet $tmp_dir/ $cfg_ssh_url:setup
 
 __success "uploading template files to the server"
