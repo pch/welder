@@ -9,9 +9,11 @@ set -eu
 
 source $WELDER_ROOT/libexec/priv/_helpers
 
-__load_config "$@" || __fail "Usage: welder compile <playbook>"
+playbook=$1
+[ -z "$playbook" ] && __fail "Usage: x compile <playbook-name>"
 
 __ensure_rsync
+__load_config "$WELDER_ROOT/$playbook.yml"
 
 tmp_dir=$(mktemp -d)
 trap 'rm -rf "$tmp_dir"' EXIT

@@ -11,10 +11,8 @@ abort() {
   exit 1
 }
 
-export WELDER_ROOT="$( cd "$( dirname "$( readlink ${BASH_SOURCE[0]} )" )/.." && pwd )"
-
-export WELDER_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/${0##*/}"
-mkdir -p "$WELDER_CACHE"
+WELDER_ROOT="$( cd "$( dirname "$( readlink ${BASH_SOURCE[0]} )" )/.." && pwd )"
+export WELDER_ROOT
 
 source "$WELDER_ROOT/libexec/priv/_helpers"
 

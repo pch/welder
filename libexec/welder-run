@@ -6,7 +6,10 @@ set -eu
 
 source $WELDER_ROOT/libexec/priv/_helpers
 
-__load_config "$@" || __fail "Usage: welder run <playbook>"
+playbook=$1
+[ -z "$playbook" ] && __fail "Usage: x run <playbook-name>"
+
+__load_config "$WELDER_ROOT/$playbook.yml"
 
 [ ! -d "$WELDER_ROOT/modules" ] && __fail "no modules/ directory found"
 
@@ -52,7 +55,7 @@ function __run_scripts() {
   done
 }
 
-welder compile "$@"
+welder compile $playbook
 
 # Ask sudo password for non-root users
 # For this to work, ssh_url needs to follow user@server-url format
@@ -64,6 +67,6 @@ fi
 
 __run_scripts
 
-welder cleanup "$@"
+welder cleanup $playbook
 
 __success "all done!"
