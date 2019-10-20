@@ -275,17 +275,29 @@ templates and config, run `welder compile <playbook>` first and
     $ gem install liquid
     ~~~
 
-2. Check out this repository into `/opt/welder` (or whatever location you
-   prefer):
+2. Check out welder into `~/Code/welder` (or whatever location you prefer):
 
     ~~~ sh
-    # git clone https://github.com/pch/welder.git /opt/welder
+    $ git clone https://github.com/pch/welder.git ~/Code/welder
     ~~~
 
-3. Add a symbolic link to the `welder` front-end in your `$PATH`:
+2. Add `~/Code/welder/bin` to your `$PATH` for access to the `welder`
+   command-line utility.
 
     ~~~ sh
-    # ln -sf /opt/welder/bin/welder /usr/local/bin/welder
+    $ echo 'export PATH="$PATH:$HOME/Code/welder/bin"' >> ~/.bash_profile
+    ~~~
+
+    **Ubuntu Desktop note**: Modify your `~/.bashrc` instead of `~/.bash_profile`.
+
+    **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.
+
+3. Restart your shell so that PATH changes take effect. (Opening a new
+   terminal tab will usually do it.) Now check if welder was set up:
+
+    ~~~ sh
+    $  which welder
+    /Users/my-user/Code/welder/bin/welder
     ~~~
 
 ## Caveats
