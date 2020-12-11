@@ -308,7 +308,6 @@ with caution. It won't protect you from screw-ups, like
 
 Use at your own risk.
 
-## Known Issues / Limitations
+## Alternatives
 
-* YAML config doesn't support nested values
-* Ruby dependency should be optional
+There's an [alternative version](https://gitlab.com/welder-cm/welder) of welder, re-implemented in Python by [@thomas-mc-work](https://github.com/thomas-mc-work).
