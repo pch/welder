@@ -17,12 +17,12 @@ abs_dirname() {
 }
 
 WELDER_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-WELDER_ROOT="$(abs_dirname $WELDER_ROOT)"
+WELDER_ROOT="$(abs_dirname "$WELDER_ROOT")"
 export WELDER_ROOT
 
-source $WELDER_ROOT/libexec/priv/_helpers
+source "$WELDER_ROOT"/libexec/priv/_helpers
 
-bin_path="$(abs_dirname $0)"
+bin_path="$(abs_dirname "$0")"
 export PATH="${bin_path}:${PATH}"
 
 command=$1

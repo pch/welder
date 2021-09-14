@@ -11,10 +11,10 @@ playbook=$1
 script=$2
 
 [ -z "$playbook" ]       && __fail "Usage: x run-script <playbook-name>"
-[ ! -f ./$playbook.yml ] && __fail "No $playbook.yml file found"
+[ ! -f ./"$playbook".yml ] && __fail "No $playbook.yml file found"
 
 __load_config "$playbook.yml"
 
-ssh -t "$cfg_ssh_url" -p "$cfg_ssh_port" "$(< $script)"
+ssh -t "$cfg_ssh_url" -p "$cfg_ssh_port" "$(< "$script")"
 
 __success "done!"

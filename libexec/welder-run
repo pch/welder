@@ -4,7 +4,7 @@
 
 set -eu
 
-source $WELDER_ROOT/libexec/priv/_helpers
+source "$WELDER_ROOT"/libexec/priv/_helpers
 
 playbook=$1
 [ -z "$playbook" ] && __fail "Usage: x run <playbook-name>"
@@ -33,18 +33,18 @@ function __run_scripts() {
       fi
     fi
 
-    for script in $(find $module_path -name "*.sh")
+    for script in $(find "$module_path" -name "*.sh")
     do
       __info "script $script\n"
 
       if [ -z ${sudo_pass+x} ]
       then
         # no sudo_pass set, run the script directly
-        ssh -t "$cfg_ssh_url" -p "$cfg_ssh_port" "$(< $script)"
+        ssh -t "$cfg_ssh_url" -p "$cfg_ssh_port" "$(< "$script")"
       else
         # wrap the ssh script with an "expect" script to automatically
         # enter sudo password
-        $WELDER_ROOT/libexec/priv/run-ssh-script "$cfg_ssh_url" "$cfg_ssh_port" "$(< $script)" $sudo_pass
+        "$WELDER_ROOT"/libexec/priv/run-ssh-script "$cfg_ssh_url" "$cfg_ssh_port" "$(< "$script")" "$sudo_pass"
       fi
 
       echo
@@ -55,7 +55,7 @@ function __run_scripts() {
   done
 }
 
-welder compile $playbook
+welder compile "$playbook"
 
 # Ask sudo password for non-root users
 # For this to work, ssh_url needs to follow user@server-url format
@@ -67,6 +67,6 @@ fi
 
 __run_scripts
 
-welder cleanup $playbook
+welder cleanup "$playbook"
 
 __success "all done!"
