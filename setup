@@ -1,0 +1,22 @@
+#!/bin/sh
+set -eu
+
+info() {
+  printf "[ \033[00;34m..\033[0m ] %s\n" "$1"
+}
+
+if [ -z "${1+x}" ]; then
+  echo "run.sh: playbook argument missing"
+  exit 1
+fi
+
+playbook_file="$1"
+
+while read -r module; do
+  info "running module $module"
+
+  find "$module" -name "*.sh" | while IFS= read -r script; do
+    info "    script: $script"
+    sudo "$script"
+  done
+done < "$playbook_file"
