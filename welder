@@ -19,10 +19,10 @@ fail() {
 
 help() {
   echo "Usage:"
-  echo "    welder <playbook> <ssh-url>"
+  echo "    welder run <playbook> <ssh-url>"
   echo ""
   echo "Example:"
-  echo "    welder playbook.conf user@example.com"
+  echo "    welder run playbook.conf user@example.com"
   exit 1
 }
 
@@ -30,7 +30,21 @@ if ! command -v rsync > /dev/null; then
   fail "Please install rsync first"
 fi
 
-[ $# -lt 2 ] && help
+[ $# -lt 3 ] && help
+
+command=$1
+case $command in
+"-h" | "--help")
+  help
+  ;;
+*)
+
+  if [ "$1" != "run" ]; then
+    help
+  fi
+  ;;
+esac
+shift 1
 
 playbook_file=$1
 ssh_url=$2
