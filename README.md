@@ -2,303 +2,166 @@
 
 Welder allows you to set up a Linux server with plain shell scripts.
 
-![](./demo.gif)
-
 I wrote it out of frustration with Ansible. Ansible is an amazing and powerful
-tool, but for my needs it's just too much. 90% of the time all I need is:
-
-~~~ sh
-ssh -t user@example.com "$(< ./my-setup-script.sh)"
-# or:
-ssh -t user@example.com "$(cat ./my-setup-script.sh)"
-~~~
+tool, but for my needs it's just too much. 90% of the time all I need is to
+be able to run a shell script on the server, without extra dependencies.
 
 In most basic terms, that's what welder does.
 
 But there's some more.
 
+**⚠️ NOTE**: if you're looking for the previous version of welder, you'll
+[find it here](https://github.com/pch/welder/tree/classic).
+
 ## Features
 
-Welder allows you to:
-
-* execute local shell scripts on the server via ssh
-* organize your scripts into a logical set of reusable modules
-* set up a server with a single command (`welder run <playbook>`)
-* run one-off shell scripts (`welder run-script <user@example.com> <path/to/script.sh>`)
-* use [liquid](https://github.com/Shopify/liquid) templates for configuration
-  (optional)
-* enter `sudo` password just once per playbook
-
-See [`welder-contrib`](https://github.com/pch/welder-contrib) for some example
-modules.
+- set up your server with a single command (`welder run <playbook> <server>`)
+- run a set of organized reusable shell scripts
+- use simple template syntax (`{{ VAR_NAME }}`) to substitute config variables
 
 ### Directory structure
 
 An example directory structure:
 
-~~~ sh
-├── modules
-│   ├── nginx
-│   │   ├── files
-│   │   │   ├── nginx.conf
-│   │   └── setup.sh
-│   ├── rails
-│   │   ├── files
-│   │   │   ├── nginx
-│   │   │   │   ├── site.conf.liquid
-│   │   │   ├── systemd
-│   │   │   │   ├── puma.service.liquid
-│   │   │   │   └── sidekiq.service.liquid
-│   │   │   └── rbenv-vars.liquid
-│   │   └── setup.sh
-│   ├── system
-│   │   ├── files
-│   │   │   ├── 10periodic
-│   │   │   └── 50unattended-upgrades
-│   │   └── setup.sh
-├── config.yml
-├── vault.yml
-├── vault.yml.gpg
-└── my-site.yml
-~~~
+```sh
+├── playbook.conf
+├── config.conf
+├── firewall
+│   ├── files
+│   │   └── rules.v4
+│   └── firewall.sh
+├── nginx
+│   └── nginx.sh
+├── system
+│   ├── files
+│   │   ├── 10periodic
+│   │   ├── 50unattended-upgrades
+│   │   └── ssh_key
+│   └── system.sh
+└── website
+    ├── files
+    │   └── site.conf.template
+    └── website.sh
+```
 
-Example playbook:
+### Playbook
 
-~~~ yaml my-site.yml
-ssh_url: admin@example.com
-ssh_port: 22  # Optional (default: 22)
+Playbook is just a list of modules to execute. Example:
 
-shared_path: ../shared # optional
+```sh
+# playbook.conf
 
-# List of modules to execute
-modules:
-  - system
-  - firewall
-  - rbenv
-  - nginx
-  - rails
-~~~
+system
+firewall
+nginx
+website
+```
+
+### Config
+
+Config file:
+
+```sh
+SITE_DOMAIN = "example.com"
+SITE_DIR = "/var/www"
+```
+
+You can reference config variables in your scripts like this:
+
+```sh
+#!/bin/sh
+set -xeu
+
+. ./config.conf
+
+echo $SITE_DOMAIN
+```
 
 ### Templates
 
-Welder uses [liquid](https://github.com/Shopify/liquid) for templates. It's
-mostly compatible with ansible's `*.j2` files:
+Welder offers simple `sed`-based templates that interpolate variables in double brackets
+with values defined in config.
 
-~~~ lua
-# modules/rails/files/nginx-site.conf.liquid
-upstream thumbor {
-  {% for port in thumbor_instances %}
-      server 127.0.0.1:{{ port }};
-  {% endfor %}
-}
+```lua
+# website/files/nginx-site.conf.template
 
 server {
     listen 80;
 
-    server_name {{ thumbor_host }};
-    include snippets/ssl-{{ app_domain }}.conf;
-
-    location / {
-        proxy_pass http://thumbor;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
+    server_name {{ SITE_DOMAIN }};
+    root {{ SITE_DIR }}/current/public;
 }
-~~~
-
-### config.yml
-
-The `config.yml` file will be used to provide variables for your `*.liquid`
-templates:
-
-~~~ yaml
-# example config.yml
-app_name: example
-app_domain: example.com
-
-ruby_version: "2.4.0"
-ruby_deploy_user: "deploy"
-rails_env: production
-
-app_dir: "/var/www/example"
-letsencrypt_web_dir: "/var/www/letsencrypt"
-
-thumbor_host: images.example.com
-thumbor_instances:
-  - 8000
-  - 8001
-  - 8002
-  - 8003
-~~~
-
-During the compilation phase, `config.yml` is turned into a bash-compatible
-format and uploaded to the server:
-
-~~~ sh
-# compiled config-variables file
-cfg_app_name='example'
-cfg_app_domain='example.com'
-cfg_ruby_version='2.4.0'
-cfg_ruby_deploy_user='deploy'
-cfg_rails_env='production'
-cfg_app_dir='/var/www/example'
-cfg_thumbor_host='images.example.com'
-cfg_thumbor_instances=(8000 8001 8002 8003)
-~~~
-
-You can then `source` it in your setup scripts:
-
-~~~ sh
-# modules/example/setup.sh
-source setup/config-variables
-
-echo $cfg_app_name
-echo $cfg_app_dir
-# (notice the $cfg_ prefix)
-~~~
-
-**NOTE**: In order for this to work reliably, `config.yml` has to be fairly flat
-and simple - nested hashes are not supported.
-
-
-### Shared Modules
-
-If you want to avoid duplicating modules across different projects, you can
-specify `shared_path` in your playbook YML file:
-
-~~~ yaml my-site.yml
-ssh_url: admin@example.com
-
-shared_path: ../shared
-
-modules:
-  - system
-  - firewall
-~~~
-
-In the example above, `../shared` directory should contain `modules` directory.
-
-### Security Notes
-
-Don't store any sensitive information (passwords etc.) in `config.yml`. If you
-want to keep passwords in git, create a `vault.yml` file, add it to .gitignore
-and store the encrypted version in revision control:
-
-~~~ sh
-# encrypt & decrypt vault.yml using your gpg key
-gpg --encrypt --recipient 'John Doe' vault.yml
-gpg --decrypt --output vault.yml vault.yml.gpg
-
-# encrypt & decrypt using a passphrase (no private/public key needed)
-gpg --symmetric --cipher-algo aes256 vault.yml
-gpg --decrypt --output vault.yml --cipher-algo aes256 vault.yml.gpg
-~~~
-
-For more information on how to set up GPG/PGP, see [this excellent tutorial][gpg].
-
-[gpg]: https://robots.thoughtbot.com/pgp-and-you
-
-Think of this as just another level of security for your private git repos. You
-probably don't want to store the encrypted vault in a public repo.
-
-#### sudo
-
-Because `sudo` password is passed as an argument to the
-[`expect script`](https://github.com/pch/welder/blob/master/libexec/priv/run-ssh-script),
-it will be visible in the process list on your local computer. This could be
-an issue if you're using a shared machine to run setup scripts.
-
-### Example setup script
-
-~~~ sh
-# modules/nginx/setup.sh
-
-set -xeu # 'u' will give you warnings on unbound config variables
-
-[[ -f setup/config-variables ]] && source setup/config-variables
-
-sudo add-apt-repository -y ppa:nginx/stable
-sudo apt-get update && sudo apt-get install -y nginx
-
-sudo service nginx start
-
-sudo cp setup/modules/nginx/files/nginx.conf /etc/nginx/nginx.conf
-
-# Disable default site
-if [ -f /etc/nginx/sites-enabled/default ]; then
-  sudo rm /etc/nginx/sites-enabled/default
-fi
-
-sudo service nginx restart
-~~~
+```
 
 ## Usage
 
-~~~ sh
-welder run my-site # runs the playbook defined in my-site.yaml
-~~~
+Run the playbook with the following command:
 
-The `run` script will compile templates and configs, upload them to the server
-(to `/home/username/setup`) and then it will ask you for the `sudo` password.
-After that, it will execute all `*.sh` scripts from the modules listed in the
-playbook file.
+```sh
+welder run playbook.conf user@example.com
+```
 
-Additional commands:
+### How it works
 
-~~~ sh
-welder compile <playbook>  # compiles templates and uploads them to the server
-welder cleanup <playbook>  # remove compiled files from the server
-~~~
+Welder goes through the modules defined in `playbook.conf`, copies them to a
+cache directory, compiles config files and templates, `rsync`s the directory to
+the server. Then it runs the `setup` script that invokes all `*.sh` files
+within the playbook (all scripts will be called with `sudo`).
 
-If you want to run a single `*.sh` script on the server, you can use this:
+### Example setup script
 
-~~~ sh
-welder run-script <user@example.com> <path/to/script.sh>
-~~~
+```sh
+# nginx/nginx.sh
 
-**NOTE**: the `run-script` command does not compile templates. It merely wraps
-`ssh -t user@example.com "$(< ./path/to/script.sh)"`. If you want access to
-templates and config, run `welder compile <playbook>` first and
-`welder cleanup <playbook>` when you're done.
+# NOTE: sudo isn't necessary because the whole script will be
+#       invoked as `sudo nginx/nginx.sh`
+
+set -xeu # 'u' will give you warnings on unbound config variables
+
+add-apt-repository -y ppa:nginx/stable
+sapt-get update && apt-get install -y nginx
+
+service nginx start
+
+cp files/nginx.conf /etc/nginx/nginx.conf
+
+# Disable default site
+if [ -f /etc/nginx/sites-enabled/default ]; then
+  rm /etc/nginx/sites-enabled/default
+fi
+
+service nginx restart
+```
 
 ## Installation
 
-1. Install dependencies
+The only dependency required by welder is `rsync` (which should be
+pre-installed on your system in most cases).
 
-   Welder requires expect, rsync and ruby. Ruby is used mainly as a
-   convenient way to parse YAML configuration files.
+1. Check out welder into `~/.welder` (or whatever location you prefer):
 
-   Optionally, if you'd like to use the templating feature,
-   you need to install [liquid](https://github.com/Shopify/liquid) gem:
+   ```sh
+   $ git clone https://github.com/pch/welder.git ~/.welder
+   ```
 
-    ~~~ sh
-    $ gem install liquid
-    ~~~
-
-2. Check out welder into `~/Code/welder` (or whatever location you prefer):
-
-    ~~~ sh
-    $ git clone https://github.com/pch/welder.git ~/Code/welder
-    ~~~
-
-2. Add `~/Code/welder/bin` to your `$PATH` for access to the `welder`
+2. Add `~/.welder/bin` to your `$PATH` for access to the `welder`
    command-line utility.
 
-    ~~~ sh
-    $ echo 'export PATH="$PATH:$HOME/Code/welder/bin"' >> ~/.bash_profile
-    ~~~
+   ```sh
+   $ echo 'export PATH="$PATH:$HOME/.welder/bin"' >> ~/.bash_profile
+   ```
 
-    **Ubuntu Desktop note**: Modify your `~/.bashrc` instead of `~/.bash_profile`.
+   **Ubuntu Desktop note**: Modify your `~/.bashrc` instead of `~/.bash_profile`.
 
-    **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.
+   **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.
 
 3. Restart your shell so that PATH changes take effect. (Opening a new
    terminal tab will usually do it.) Now check if welder was set up:
 
-    ~~~ sh
-    $  which welder
-    /Users/my-user/Code/welder/bin/welder
-    ~~~
+   ```sh
+   $  which welder
+   /Users/my-user/Code/welder/bin/welder
+   ```
 
 ## Caveats
 
@@ -310,4 +173,6 @@ Use at your own risk.
 
 ## Alternatives
 
-There's an [alternative version](https://gitlab.com/welder-cm/welder) of welder, re-implemented in Python by [@thomas-mc-work](https://github.com/thomas-mc-work).
+There's an [alternative version](https://gitlab.com/welder-cm/welder) of welder
+(the classic version), re-implemented in Python by
+[@thomas-mc-work](https://github.com/thomas-mc-work).
